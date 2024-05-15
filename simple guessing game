@@ -1,0 +1,34 @@
+#include <stdio.h>
+int secretNum=5;
+char userInput;
+int main()
+{
+    do{
+        int tries=3;
+        int userGuess=0;
+        while(userGuess!=secretNum && tries>0)
+        {
+            printf("Guess the secret num\nTries left:%d\n",tries);
+            scanf("%d", &userGuess);
+            if(userGuess==secretNum)
+            {
+                printf("congrats!!\n");
+            }
+            else
+            {
+                printf("try again\n");
+                tries--;
+            }
+        }
+        if(userGuess!=secretNum)
+        {
+            printf("You lose\n");
+        }
+        printf("Do you want to play again? Y/N:");
+        scanf(" %c", &userInput);
+    }while(userInput !='N'&&userInput!='n');
+    return 0;
+}
+
+
+
