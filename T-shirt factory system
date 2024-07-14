@@ -1,0 +1,594 @@
+#include <stdio.h>
+void Order(int *totalunits,float *totalgrossprofit,float *totaltax);
+char * shirtType(char type);
+void print_Shirt(char ShirtType, char measurement, char leftSleeve, char rightSleeve, char leftChest, char rightChest, char leftBottom, char rightBottom);
+void tagalagay_adOn(char typeOfadOn, char *pleft_sleeve, char *pright_sleeve, char *pleft_chest, char *pright_chest, char *pleft_bottom, char *pright_bottom);
+float shirtBaseRate(int amount, char shirtType);
+float AddBaseRate(char TypeOfAddon, int amountOfAddon, int *pLogo_ColorCount);
+void ProcessingTime(int *punits, int *pLogos, int *pPockets, int *pPatches);
+void GiveUserChange(float *change);
+
+void OrderSummary(int *totalunits,float *totalgrossprofit,float *totaltax);
+
+void ResetDay(int *totalunits,float *totalgrossprofit,float *totaltax);
+int main()
+{
+    int userInput;
+    int TOTALunitsOrdered=0;
+    float TOTALgrossProfit=0;
+    float TOTALtaxl=0;
+    do{
+         printf("Menu\n1 - Order\n2 - Show order summary for the day\n3 - Start new day\n4 - Shutdown for maintenance\nEnter option:");
+        scanf("%d", &userInput);
+        if (userInput==1) Order(&TOTALunitsOrdered,&TOTALgrossProfit,&TOTALtaxl);
+        if (userInput==2) OrderSummary(&TOTALunitsOrdered,&TOTALgrossProfit,&TOTALtaxl);
+        if (userInput==3) ResetDay(&TOTALunitsOrdered,&TOTALgrossProfit,&TOTALtaxl);
+    }while(userInput != 4);
+    return 0;
+}
+/*
+    <Function serves as the main menu to ensure that int main is easier to change later on>
+    Order function does not take any parameters
+    Only purpose is to serve as the main GUI
+*/
+void Order(int *totalunits,float *totalgrossprofit,float *totaltax)
+{
+    char orderConfirmation;
+    float amountUserpaid;
+    float TOTALex;
+    do{
+        char type;
+        char Size;
+        int units;
+        char adOn;
+        int Logo_ColorCount;
+        int Logo_count, Pocket_count, Patch_count;
+        float subtotal;
+        float tax;
+        float total;
+        char left_sleeve, right_sleeve, left_chest, right_chest, left_bottom, right_bottom;
+        left_sleeve = ' ';
+        right_sleeve = ' ';
+        left_chest = ' ';
+        right_chest = ' ';
+        left_bottom = ' ';
+        right_bottom = ' ';
+        printf("Order form\n");
+        printf("What is your preferred type?\nR - round neck\nV - V-neck\nYour choice:");
+        do{
+            scanf(" %c", &type);
+            switch(type)
+            {
+                case 'R':
+                case 'r':
+                    printf("Printing Round neck\n");
+                break;
+                case 'V':
+                case 'v':
+                    printf("Printing V-Neck\n");
+                break;
+                default:
+                    printf("Hindi ka niya type\n");
+                    type='0';
+            }
+        }while(type=='0');
+        printf("What size do you want your t-shirts?(S, M, L, X): ");
+        do{   
+            scanf(" %c", &Size);
+            switch(Size)
+            {
+                case 's':
+                case 'S':
+                    printf("Printing small\n");
+                    print_Shirt(type, Size, left_sleeve, right_sleeve, left_chest, right_chest, left_bottom, right_bottom);
+                break;
+                case 'm':
+                case 'M':
+                    printf("Printing Medium\n");
+                    print_Shirt(type, Size, left_sleeve, right_sleeve, left_chest, right_chest, left_bottom, right_bottom);
+    
+                break;
+                case 'l':
+                case 'L':
+                    printf("Printing Large\n");
+                    print_Shirt(type, Size, left_sleeve, right_sleeve, left_chest, right_chest, left_bottom, right_bottom);
+    
+                break;
+                case 'x':
+                case 'X':
+                    printf("Printing Extra Large\n");
+                    print_Shirt(type, Size, left_sleeve, right_sleeve, left_chest, right_chest, left_bottom, right_bottom);
+                break;
+                default:
+                    printf("Invalid Character\n");
+                    Size='0';
+            }
+        }while(Size=='0');
+        do{
+            printf("Give quantity of order(Must be at least 5:");
+            scanf("%d", &units);
+            if(units>=5)
+            {
+                printf("Order\n");
+            }
+            else
+            {
+                printf("Should be ATLEAST 5:");
+            }
+        }while(units<5);
+        char YN;
+        Logo_count=0;
+        Pocket_count=0;
+        Patch_count=0;
+        do{
+            do{
+                printf("T-shirt add-ons:\nL-logo (Price depends on color amount)\nP-patch 15/pc\nO-pocket 5/pc\nYour choice:");
+                scanf(" %c", &adOn);
+                switch(adOn)
+                {
+                    case 'L':
+                    case 'l':
+                        tagalagay_adOn(adOn, &left_sleeve, &right_sleeve, &left_chest, &right_chest, &left_bottom, &right_bottom);
+                        printf("How many colors would you like for the logo?\n1 color-18/pc\n2 color-20/pc\n3-5 color-25/pc\nYour choice:");
+                        scanf("%d", &Logo_ColorCount);
+                        Logo_count+=1;
+                    break;
+                    case 'O':
+                    case 'o':
+                        tagalagay_adOn(adOn, &left_sleeve, &right_sleeve, &left_chest, &right_chest, &left_bottom, &right_bottom);
+                        Pocket_count+=1;
+                    break;
+                    case 'P':
+                    case 'p':
+                        tagalagay_adOn(adOn, &left_sleeve, &right_sleeve, &left_chest, &right_chest, &left_bottom, &right_bottom);
+                        Patch_count+=1;
+                    break;
+                    default: 
+                        printf("Add-on not found\n");
+                        adOn='0';
+                }
+            }while(adOn=='0');
+            printf("Would you like to put another add-on?\nY/N: ");
+            scanf(" %c", &YN);
+        }while(YN=='Y'||YN=='y');
+        subtotal= shirtBaseRate(units,Size)+AddBaseRate('l', Logo_count, &Logo_ColorCount)+AddBaseRate('o', Pocket_count, &Logo_ColorCount)+AddBaseRate('p', Patch_count, &Logo_ColorCount);
+        tax = (subtotal*units)*.12;
+        total=(subtotal*units)+tax;    
+        printf("*-----------------------------*\n");
+        printf("|        BlueGreenCorner      |\n");
+        printf("*-----------------------------*\n");
+        printf("-%d pcs of %s            %.2f  \n", units, shirtType(type), shirtBaseRate(units,Size));
+        if(Logo_count!=0)
+        {
+        printf("-%d pcs of %d color Logo %.2f  \n", Logo_count, Logo_ColorCount, AddBaseRate('l', Logo_count, &Logo_ColorCount));
+        }
+        if(Pocket_count!=0)
+        {
+        printf("-%d pcs of Pockets       %.2f  \n", Pocket_count, AddBaseRate('o', Pocket_count, &Logo_ColorCount));
+        }
+        if(Patch_count!=0)
+        {
+        printf("-%d pcs of Patches       %.2f  \n", Patch_count, AddBaseRate('p', Patch_count, &Logo_ColorCount));
+        }
+        printf("-------------------------------\n");
+        printf("-subtotal   %.2fx%d=%.2f\n", subtotal,units, subtotal*units);
+        printf("-Tax(12prcnt)               %.2f   \n", tax);
+        printf("-Total                  %.2f   \n", total);
+        printf("*-----------------------------*\n");
+        printf("|    Thank you for Ordering   |\n");
+        printf("*-----------------------------*\n");
+        print_Shirt(type, Size, left_sleeve, right_sleeve, left_chest, right_chest, left_bottom, right_bottom);
+        printf("Expected Processing Time:\n");
+        ProcessingTime(&units, &Logo_count, &Pocket_count,&Patch_count);
+        printf("Confirm order?(Y/N):");
+        scanf(" %c", &orderConfirmation);
+        if(orderConfirmation!='N' && orderConfirmation!='Y')
+        {
+            printf("I am giving you one last chance to only choose between 'N' or 'Y'\nRefuse and the entire process resets\nYour choice:");
+            scanf(" %c", &orderConfirmation);
+            if(orderConfirmation=='Y')
+            {
+                TOTALex=total;
+            }
+        }
+        if(orderConfirmation=='Y')
+        {
+            TOTALex=total;
+            *totalunits+=units;
+            *totalgrossprofit+=subtotal*units; 
+            *totaltax+=tax;
+        }
+    }while(orderConfirmation!='N'&&orderConfirmation!='Y');
+    if(orderConfirmation=='Y')
+    {
+        do{
+            printf("Enter amount paid:");
+            scanf(" %f", &amountUserpaid);
+            if(amountUserpaid>=TOTALex)
+            {
+                TOTALex=amountUserpaid-TOTALex;
+                printf("Your change: %.2f\n", TOTALex);
+                GiveUserChange(&TOTALex);
+            }
+            else
+            {
+                printf("Too broke\n");
+            }
+        }while(amountUserpaid<TOTALex);
+    }
+    else
+    {
+        printf("Goodbye\n");
+    }
+}
+/*
+    This function chooses which t-shirt type the user chose 
+    Precondition: chars R/r or V/v to determine if it's a round neck or V-neck
+    @param type is the char input for round neck(R) or V-neck(V)
+    @return the type of t-shirt
+*/
+char * shirtType(char type)
+{
+    switch(type)
+    {
+        case 'R':
+        case 'r':
+           return "R-neck";
+        break;
+        case 'V':
+        case 'v':
+            return "V-neck";
+        break;
+    }
+}
+
+void print_Shirt(char ShirtType, char measurement, char leftSleeve, char rightSleeve, char leftChest, char rightChest, char leftBottom, char rightBottom)
+{
+    int size=0;
+    switch(measurement)
+    {
+        case 's':
+        case 'S':
+            size=5;
+        break;
+        case 'm':
+        case 'M':
+            size=7;
+        break;
+        case 'l':
+        case 'L':
+            size=9;
+        break;
+        case 'x':
+        case 'X':
+            size=11;
+        break;
+    }
+    for(int x=0; x<2;x++)
+    {
+        for(int x=0; x<3;x++)
+        {
+            printf(" ");
+        }
+        for(int x=0; x<size;x++)
+        {
+            printf("x");
+        }
+    }
+    printf("\n");
+    switch(ShirtType)
+    {
+        case 'v':
+        case 'V':
+            for(int y=0; y<2;y++)
+            {
+                for(int x=2; x>y;x--) printf(" ");
+                printf("x");
+                for(int x=0; x<size;x++) printf(" ");
+                printf("x");
+            }
+            printf("\n");
+            for(int y=0; y<2;y++)
+            {
+                for(int x=1;x>y;x--) printf(" ");
+                printf("x");
+                if(y==0) printf(" %c", leftSleeve);
+                for(int x=0;x<size;x++) printf(" ");
+                if(y==1) printf("%c x", rightSleeve);
+            }
+        break;
+        case 'R':
+        case 'r':
+            for(int x=0;x<2;x++)
+            {   
+                if(x==0) 
+                {
+                    printf("  ");
+                    printf("x");
+                }
+                if(x==1) printf("xxx");
+                for(int x=0; x<size; x++) printf(" ");
+                if(x==1) printf("x");
+            }
+            printf("\n ");
+            printf("x %c", leftSleeve);
+            for(int x=0; x<size*2+1;x++) printf(" ");
+            printf("%c x", rightSleeve);
+        break;
+    }
+    printf("\n");
+    for(int x=0; x<2;x++)
+    {
+        for(int x=0;x<5;x++) printf("x");
+        if(x==0)
+        {
+            for(int x=0; x<size+4+(size-5); x++) printf(" ");
+        }
+    }
+    printf("\n");
+    for(int x=0; x<4; x++) printf(" ");
+    printf("x%c", leftChest);
+    for(int x=0; x<size+(size-3); x++) printf(" ");
+    printf("%cx", rightChest);
+    printf("\n");
+    for(int x=0; x<size-3;x++)
+    {
+        for(int x=0;x<4;x++) printf(" ");
+        printf("x");
+        for(int x=0; x<size+(size-1); x++) printf(" ");
+        printf("x");
+        printf("\n");
+    }
+    for(int x=0; x<4; x++) printf(" ");
+    printf("x%c", leftBottom);
+    for(int x=0; x<size+(size-3); x++) printf(" ");
+    printf("%cx", rightBottom);
+    printf("\n");
+    for(int x=0; x<4; x++) printf(" ");
+    for(int x=0; x<size+(size+1); x++) printf("x");
+    printf("\n");
+}
+
+void tagalagay_adOn(char typeOfadOn, char *pleft_sleeve, char *pright_sleeve, char *pleft_chest, char *pright_chest, char *pleft_bottom, char *pright_bottom) {
+    char location;
+    printf("Pick a location for add-on\n");
+    do {
+        printf("1. Left sleeve  2. Right sleeve\n3. Left chest  4. Right chest\n5. Left bottom  6. Right bottom\nYour choice: ");
+        scanf(" %c", &location); 
+        switch (location) {
+            case '1':
+                if(typeOfadOn=='o'||typeOfadOn=='O')
+                {
+                    printf("Pockets on sleeves is dumb\n");
+                    location='0';
+                }
+                else if (*pleft_sleeve == ' ')
+                {
+                    *pleft_sleeve = typeOfadOn;
+                }
+                else
+                {
+                    printf("Location already has a design\n");
+                    location='0';
+                }
+                break;
+            case '2':
+                if(typeOfadOn=='o'||typeOfadOn=='O')
+                {
+                    printf("Pockets on sleeves is dumb\n");
+                    location='0';
+                }
+                else if(*pright_sleeve == ' ')
+                {
+                    *pright_sleeve = typeOfadOn;
+                }
+                else
+                {
+                    printf("Location already has a design\n");
+                    location = '0';
+                }
+                break;
+            case '3':
+                if(*pleft_chest == ' ')
+                {
+                    *pleft_chest = typeOfadOn;
+                }
+                else
+                {
+                    printf("Location already has a design\n");
+                    location = '0';
+                }
+                break;
+            case '4':
+                if(*pright_chest == ' ')
+                {
+                    *pright_chest = typeOfadOn;
+                }
+                else
+                {
+                    printf("Location already has a design\n");
+                    location = '0';
+                }
+                break;
+            case '5':
+                if(*pleft_bottom == ' ')
+                {    
+                    *pleft_bottom = typeOfadOn;
+                }
+                else
+                {
+                    printf("Location already has a design\n");
+                    location = '0';
+                }
+                break;
+            case '6':
+                if(*pright_bottom == ' ')
+                {
+                    *pright_bottom = typeOfadOn;
+                }
+                else
+                {
+                    printf("Location already has a design\n");
+                    location = '0';
+                }
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+                location = '0';
+                break;
+        }
+    } while (location == '0');
+}
+
+float shirtBaseRate(int amount, char shirtType)
+{
+    float price;
+    if(amount>500)
+    {
+        price=75;
+    }
+    else if(amount>=300 && amount<=500)
+    {
+        price=80;
+    }
+    else
+    {
+        price=100;
+    }
+    if(shirtType=='x'||shirtType=='X')
+    {
+        price=price+(price*.01);
+    }
+    return price;
+}
+float AddBaseRate(char TypeOfAddon, int amountOfAddon, int *pLogo_ColorCount)
+{
+    float price;
+    switch(TypeOfAddon)
+    {
+        case 'l':
+        case 'L':
+            if(*pLogo_ColorCount>=3 || *pLogo_ColorCount<=5)
+            {
+                price=amountOfAddon*25;
+            }
+            else if(*pLogo_ColorCount==2)
+            {
+                price=amountOfAddon*20;
+            }
+            else
+            {
+                price=amountOfAddon*18;
+            }
+            if(amountOfAddon>=300||amountOfAddon<=500)
+            {
+                price=price*.09;
+            }
+            else if(amountOfAddon>500)
+            {
+                price=price*.75;    
+            }
+        break;
+        case 'o':
+        case 'O':
+            price=amountOfAddon*5;
+        break;
+        case 'p':
+        case 'P':
+            price=amountOfAddon*15;
+        break;
+    }
+    return price;
+}
+
+void ProcessingTime(int *punits, int *pLogos, int *pPockets, int *pPatches)
+{
+    int days, hours, minutes, Totalseconds;
+    int pickUpday;
+    Totalseconds = *punits*(60**pLogos+20**pPatches+30**pPockets);
+    minutes=Totalseconds/60;
+    hours=minutes/60;
+    minutes=minutes%60;
+    days=hours/24;
+    hours=hours%24;
+    if(days!=0)
+    {
+        printf("%d days,",days);
+    }
+    if(hours!=0)
+    {
+        printf("%d hours,",hours);
+    }
+    if(minutes!=0)
+    {
+        printf("%d minutes",minutes);
+    }
+    printf("\n");
+    pickUpday = 2+days+(hours/12);
+    printf("Order can be picked up after %d days\n", pickUpday);
+}
+
+void GiveUserChange(float *change)
+{
+    int Thousand, FiveHundred, Hundred, Tens, Fives, Ones, TwentyFivecent, Fivecent, Cent;
+    Cent=*change/.01;
+    Fivecent=Cent/5;
+    Cent=Cent%1;
+    TwentyFivecent=Fivecent/5;
+    Fivecent=Fivecent%5;
+    Ones=TwentyFivecent/4;
+    TwentyFivecent=TwentyFivecent%4;
+    Fives=Ones/5;
+    Ones=Ones%5;
+    Tens=Fives/2;
+    Fives=Fives%2;
+    Hundred=Tens/10;
+    Tens=Tens%10;
+    FiveHundred=Hundred/5;
+    Hundred=Hundred%5;
+    Thousand=FiveHundred/2;
+    FiveHundred=FiveHundred%2;
+    printf("%d-1000 peso\n", Thousand);
+    printf("%d-500 peso\n", FiveHundred);
+    printf("%d-100 peso\n", Hundred);
+    printf("%d-10 peso\n", Tens);
+    printf("%d-5 peso\n", Fives);
+    printf("%d-1 peso\n", Ones);
+    printf("%d-25 Cents\n", TwentyFivecent);
+    printf("%d-5 Cents\n", Fivecent);
+    printf("%d-Cents\n",Cent);
+}
+
+//-------------------------------------------------------------ORDER-SUMMARY--------------------------------------------------------------------------//
+void OrderSummary(int *totalunits,float *totalgrossprofit,float *totaltax)
+{
+    printf("Good day, owner\n");
+    printf("Order summary:\n");
+    printf("Total shirts ordered: %d\n", *totalunits);
+    printf("Gross profit:%.2f\n", *totalgrossprofit);
+    printf("Total Tax:%.2f\n", *totaltax);
+    printf("Profit earned: %.2f\n", *totalgrossprofit-*totaltax);
+}
+//------------------------------------------------------------RESET-DAY------------------------------------------------------------------------------//
+void ResetDay(int *totalunits,float *totalgrossprofit,float *totaltax)
+{
+    char userInput;
+    do{
+        printf("Are you sure you want to reset?(Y/N)");
+        scanf(" %c", &userInput);
+        if(userInput=='Y'||userInput=='y')
+        {
+            *totalunits=0;
+            *totalgrossprofit=0;
+            *totaltax=0;
+        }
+        else if(userInput=='n'||userInput=='N')
+        {
+            printf("Have a good day\n");
+        }
+        else
+        {
+            printf("Invalid input\n");
+        }
+    }while(userInput!='Y'&&userInput!='y'&&userInput!='n'&&userInput!='N');
+}
