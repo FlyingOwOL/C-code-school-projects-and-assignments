@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+main()
+{
+    const num=50;
+    char letters[num];
+    printf("Enter inital texts:");
+    scanf("%s", &letters);
+    printf("After:");
+    for(int x=0, s=strlen(letters);x<s;x++)
+    {
+        if(letters[x]>='a' && letters[x]<='z')
+        {
+            printf("%c", letters[x]-32);
+        }
+        else
+        {
+            printf("%c", letters[x]);
+        }
+    }
+    printf("\n");
+    printf("Using ctype:");
+    for(int x=0,s = strlen(letters); x<s;x++)
+    {
+        printf("%c", toupper(letters[x]));
+    }
+    return 0;
+}
