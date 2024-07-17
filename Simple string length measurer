@@ -1,0 +1,20 @@
+#include <stdio.h>
+#include <string.h>
+const int num = 10;
+int main()
+{
+    char name[num];
+    int charCount=0;
+    printf("Enter your name: ");
+    
+    scanf("%s", &name);
+    while(name[charCount]!='\0')
+    {
+        charCount++;
+    }
+    printf("String length:%d\n",charCount);
+    printf("Your name: %s\n",  name);
+    charCount= strlen(name);
+    printf("String length using strlen:%d", charCount);
+    
+}
