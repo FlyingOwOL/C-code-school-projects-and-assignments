@@ -1,0 +1,28 @@
+#include <stdio.h>
+void recursion(int n, char x);
+
+int main()
+{
+    int num=0;
+    char user=' ';
+    printf("Pick between 0 and 10 and between 'u' and 'n':");
+    scanf("%i %c", &num, &user);
+    recursion(num, user);
+    return 0;
+}
+void recursion(int n, char x)
+{
+    if(n<10 && x=='u')
+    {
+        recursion(n+1, 'u');
+    }
+    if(n>1 && x=='n')
+    {
+        recursion(n-1, 'n');
+    }
+    for(int x=0; x<n;x++)
+    {
+        printf("*");
+    }
+    printf("\n");
+}
