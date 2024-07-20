@@ -1,0 +1,35 @@
+#include <stdio.h>
+#define GLOBALNUM 5
+
+int main()
+{
+    int left, right;
+    left=0;
+    right=GLOBALNUM-1;
+    int rent[GLOBALNUM]={1, 10, 100, 1000, 10000};
+    int found=0;
+    int userNum=1000;
+    while(left<=right)
+    {
+        int middle=left+(right-left)/2;
+        if(rent[middle]==1000)
+        {
+            printf("Found %i\n", rent[middle]);
+            found=1;
+            break;
+        }
+        else if(rent[middle]<userNum)
+        {
+            left=middle+1;
+        }
+        else
+        {
+            right=middle-1;
+        }
+    }
+    if(!found)
+    {
+        printf("number not found\n");
+    }
+    return 0;
+}
