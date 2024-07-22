@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+int main()
+{
+    char *userInput=malloc(sizeof(char)*10);
+    if(userInput==NULL)
+    {
+        return 1;
+    }
+    char *UPPERCASE;
+    printf("Giv me:");
+    scanf("%s", userInput);
+    UPPERCASE=malloc(strlen(userInput)+1);
+    if(UPPERCASE==NULL)
+    {
+        return 1;
+    }
+    strcpy(UPPERCASE,userInput);
+    for(int x=0, y=strlen(userInput); x<y; x++)
+    {
+        UPPERCASE[x]=toupper(UPPERCASE[x]);
+    }
+    printf("%s\n", userInput);
+    printf("%s\n", UPPERCASE);
+    free(userInput);
+    free(UPPERCASE);
+    return 0;
+}
