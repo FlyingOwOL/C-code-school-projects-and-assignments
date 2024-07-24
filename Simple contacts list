@@ -1,0 +1,105 @@
+#include <stdio.h>
+
+void addContact(int *noOfcontacts);
+void viewContact(int *noOfcontacts);
+void deleteContact(int *noOfcontacts);
+
+int main() {
+    int noOfcontacts = 0;
+    int userChoice = 0;
+    do {
+        printf("Pick one option:\n1. Add contact\n2. View contacts\n3. Delete contacts\n4. Exit\nYour choice: ");
+        scanf("%i", &userChoice);
+        switch (userChoice) {
+            case 1:
+                addContact(&noOfcontacts);
+                break;
+            case 2:
+                viewContact(&noOfcontacts);
+                break;
+            case 3:
+                deleteContact(&noOfcontacts);
+                break;
+            default:
+                printf("Invalid input\n");
+        }
+    } while (userChoice != 4);
+    return 0;
+}
+
+void addContact(int *noOfcontacts) {
+    char name[16];
+    char number[18];
+    printf("Give new contact name: ");
+    scanf("%15s", name);
+    printf("Give new contact number: ");
+    scanf("%17s", number);
+    FILE *contacts = fopen("Contacts_list.txt", "a");
+    if (contacts == NULL) {
+        perror("Could not open file");
+        return;
+    }
+    fprintf(contacts, "%s|%s\n", name, number);
+    fclose(contacts);
+    printf("New contact successfully added\n");
+    *noOfcontacts += 1;
+}
+
+void viewContact(int *noOfcontacts) {
+    char line[36];
+    FILE *contacts = fopen("Contacts_list.txt", "r");
+    if (contacts == NULL) {
+        perror("Could not open file");
+        return;
+    }
+    printf("Contact List:\n");
+    for (int x = 0; x < *noOfcontacts; x++) {
+        if (fgets(line, sizeof(line), contacts)) {
+            printf("%d. %s", x + 1, line); // Displaying the line number with the contact
+        }
+    }
+    fclose(contacts);
+}
+
+void deleteContact(int *noOfcontacts) {
+    viewContact(noOfcontacts); // Display all contacts to the user
+
+    if (*noOfcontacts == 0) { // Check if there are no contacts to delete
+        printf("No contacts to delete.\n");
+        return;
+    }
+
+    int lineToDelete;
+    printf("Enter the number of the contact to delete: ");
+    scanf("%d", &lineToDelete);
+
+    if (lineToDelete < 1 || lineToDelete > *noOfcontacts) { // Validate the input
+        printf("Invalid contact number.\n");
+        return;
+    }
+
+    FILE *contacts = fopen("Contacts_list.txt", "r");
+    FILE *tempFile = fopen("temp.txt", "w");
+    if (contacts == NULL || tempFile == NULL) {
+        perror("Could not open file");
+        return;
+    }
+
+    char line[36];
+    for(int currentLine = 1;fgets(line, sizeof(line), contacts);currentLine++) 
+    { // Read each line from the original file
+        if (currentLine != lineToDelete) 
+        { // Write to temp file except the line to delete
+            fputs(line, tempFile);
+        } 
+    }
+
+    fclose(contacts);
+    fclose(tempFile);
+
+    remove("Contacts_list.txt"); // Delete the original file
+    rename("temp.txt", "Contacts_list.txt"); // Rename the temp file
+
+    *noOfcontacts -= 1; // Update the contact count
+    printf("Contact successfully deleted\n");
+}
