@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define maxchars 10
+
+typedef struct node
+{
+    int number;
+    struct node *link;
+}node;
+int main()
+{
+    char number[maxchars];
+    node *head=NULL;
+    printf("Enter numbers:");
+    scanf("%9s", number);
+    printf("linked list:");
+    for(int x=0; x<strlen(number);x++)
+    {
+        int numbers=number[x]-'0'; //converts char to int
+        node *holder=malloc(sizeof(node));
+        if(holder==NULL)
+        {
+            return 1;
+        }
+        holder->number=numbers;
+        holder->link=NULL;
+        holder->link=head;
+        head=holder;
+    }
+    for(node *ptr=head; ptr!=NULL; ptr=ptr->link)
+    {
+        printf("%i",ptr->number);
+    }
+    printf("\n");
+    printf("Reversed linked list:");
+    node *prev=NULL;
+    node *next=NULL;
+    while(head!=NULL)
+    {
+        next = head->link;
+        head->link=prev;
+        prev=head;
+        head=next;
+    }
+    head=prev;
+    for(node *ptr=head; ptr!=NULL; ptr=ptr->link)
+    {
+        printf("%i",ptr->number);
+    }
+    node *temp;
+    while (head != NULL) {
+        temp = head;
+        head = head->link;
+        free(temp);
+    }
+}
+
