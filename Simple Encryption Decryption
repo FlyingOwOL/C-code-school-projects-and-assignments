@@ -1,23 +1,24 @@
-
-   OnlineGDB beta
-online compiler and debugger for c/c++
-Welcome, FlyingOwOL 
-String length measurement
-Create New Project
-My Projects
-Classroom new
-Learn Programming
-Programming Questions
-Upgrade
-Learn Python with KodeKloud
-About • FAQ • Blog • Terms of Use • Contact Us • GDB Tutorial • Credits • Privacy
-© 2016 - 2024 GDB Online
-       Language    
-main.c
-
-        
-input
-Command line arguments:
-
-Standard Input:   Interactive Console   Text
-×
+#include <stdio.h>
+#include <string.h>
+const int num = 50;
+int main()
+{
+    char letters[num];
+    int iterations=1;
+    printf("To be encrypted:");
+    scanf("%s", &letters);
+    printf("Encrypted code:");
+    for(int x=0, y=strlen(letters); x<y; x++)
+    {
+        printf("%c", letters[x]+iterations);
+    }
+    printf("\n");
+    printf("To be decrypted:");
+    scanf("%s", &letters);
+    printf("Decrypted code:");
+    for(int x=0, y=strlen(letters); x<y; x++)
+    {
+        printf("%c", letters[x]-iterations);
+    }
+    return 0;
+}
