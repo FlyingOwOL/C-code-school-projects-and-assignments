@@ -1,0 +1,487 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <time.h>
+
+#define MAX_WORD_LENGTH 50
+#define MAX_CLUE_LENGTH 200
+#define MAX_CLUES 10
+#define MAX_WORDS 1000
+#define MAX_BOARD_SIZE 10
+#define MIN_BOARD_SIZE 3
+
+char board[MAX_BOARD_SIZE][MAX_BOARD_SIZE];
+int boardSize;
+
+typedef struct 
+{
+    char word[MAX_WORD_LENGTH];
+    char clues[MAX_CLUES][MAX_CLUE_LENGTH];
+    int clue_count;
+} WordEntry;
+
+typedef struct 
+{
+    WordEntry words[MAX_WORDS];
+    int word_count;
+} Dictionary;
+
+Dictionary dict;
+
+void initializeDictionary() 
+{
+    dict.word_count = 0;
+}
+
+void gamePhase();
+void adminPhase();
+
+void addWord();
+void addTrivia();
+void modifyEntry();
+void deleteWord();
+void deleteClue();
+void viewWords();
+void viewClues();
+void exportDictionary();
+void importDictionary();
+
+void initializeBoard();
+void displayBoard();
+int selectBoardSize();
+int askTrivia(WordEntry* word);
+void playGame();
+
+int main() 
+{
+    int choice;
+    initializeDictionary();
+
+    while (choice!=3) 
+    {
+        printf("\n--- Trivia Game Main Menu ---\n");
+        printf("1. Game\n");
+        printf("2. Admin\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) 
+        {
+            case 1:
+                gamePhase();
+                break;
+            case 2:
+                adminPhase();
+                break;
+            case 3:
+                printf("Thank you for playing. Goodbye!\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+
+void gamePhase() 
+{
+    char playAgain;
+    do {
+        boardSize = selectBoardSize();
+        initializeBoard();
+        displayBoard();
+        playGame();
+        
+        printf("Do you want to play again? (y/n): ");
+        scanf(" %c", &playAgain);
+        getchar(); // Consume newline
+    } while (playAgain == 'y' || playAgain == 'Y');
+}
+
+void adminPhase() 
+{
+    int choice;
+    do {
+        printf("\n--- Admin Phase ---\n");
+        printf("1. Add Word\n");
+        printf("2. Add Trivia\n");
+        printf("3. Modify Entry\n");
+        printf("4. Delete Word\n");
+        printf("5. Delete Clue\n");
+        printf("6. View Words\n");
+        printf("7. View Clues\n");
+        printf("8. Export\n");
+        printf("9. Import\n");
+        printf("10. Back to Main Menu\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); // Consume newline
+
+        switch (choice) {
+            case 1: addWord(); break;
+            case 2: addTrivia(); break;
+            case 3: modifyEntry(); break;
+            case 4: deleteWord(); break;
+            case 5: deleteClue(); break;
+            case 6: viewWords(); break;
+            case 7: viewClues(); break;
+            case 8: exportDictionary(); break;
+            case 9: importDictionary(); break;
+            case 10: printf("Returning to Main Menu.\n"); break;
+            default: printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 10);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void addWord() 
+{
+    if (dict.word_count >= MAX_WORDS) 
+    {
+        printf("Dictionary is full. Cannot add more words.\n");
+        return;
+    }
+
+    WordEntry newEntry;
+    printf("Enter the new word: ");
+    scanf("%s", newEntry.word);
+    getchar(); // Consume newline
+
+    printf("Enter the first trivia clue: ");
+    fgets(newEntry.clues[0], MAX_CLUE_LENGTH, stdin);
+    newEntry.clues[0][strcspn(newEntry.clues[0], "\n")] = 0; // Remove newline
+    newEntry.clue_count = 1;
+
+    dict.words[dict.word_count++] = newEntry;
+    printf("Word added successfully.\n");
+}
+
+void addTrivia() 
+{
+    char word[MAX_WORD_LENGTH];
+    printf("Enter the word to add trivia to: ");
+    scanf("%s", word);
+    getchar(); // Consume newline
+
+    for (int i = 0; i < dict.word_count; i++) {
+        if (strcmp(dict.words[i].word, word) == 0) {
+            if (dict.words[i].clue_count >= MAX_CLUES) {
+                printf("This word already has the maximum number of clues.\n");
+                return;
+            }
+            printf("Enter new trivia clue: ");
+            fgets(dict.words[i].clues[dict.words[i].clue_count], MAX_CLUE_LENGTH, stdin);
+            dict.words[i].clues[dict.words[i].clue_count][strcspn(dict.words[i].clues[dict.words[i].clue_count], "\n")] = 0;
+            dict.words[i].clue_count++;
+            printf("Trivia added successfully.\n");
+            return;
+        }
+    }
+    printf("Word not found in the dictionary.\n");
+}
+
+void modifyEntry() 
+{
+    char word[MAX_WORD_LENGTH];
+    printf("Enter the word to modify: ");
+    scanf("%s", word);
+    getchar(); // Consume newline
+
+    for (int i = 0; i < dict.word_count; i++) {
+        if (strcmp(dict.words[i].word, word) == 0) {
+            printf("Enter new word (or press enter to keep current): ");
+            char newWord[MAX_WORD_LENGTH];
+            fgets(newWord, MAX_WORD_LENGTH, stdin);
+            newWord[strcspn(newWord, "\n")] = 0;
+            if (strlen(newWord) > 0) {
+                strcpy(dict.words[i].word, newWord);
+            }
+
+            printf("Modify clues? (y/n): ");
+            char choice;
+            scanf(" %c", &choice);
+            getchar(); // Consume newline
+            if (choice == 'y' || choice == 'Y') {
+                for (int j = 0; j < dict.words[i].clue_count; j++) {
+                    printf("Current clue %d: %s\n", j+1, dict.words[i].clues[j]);
+                    printf("Enter new clue (or press enter to keep current): ");
+                    char newClue[MAX_CLUE_LENGTH];
+                    fgets(newClue, MAX_CLUE_LENGTH, stdin);
+                    newClue[strcspn(newClue, "\n")] = 0;
+                    if (strlen(newClue) > 0) {
+                        strcpy(dict.words[i].clues[j], newClue);
+                    }
+                }
+            }
+            printf("Entry modified successfully.\n");
+            return;
+        }
+    }
+    printf("Word not found in the dictionary.\n");
+}
+
+void deleteWord() 
+{
+    char word[MAX_WORD_LENGTH];
+    printf("Enter the word to delete: ");
+    scanf("%s", word);
+
+    for (int i = 0; i < dict.word_count; i++) {
+        if (strcmp(dict.words[i].word, word) == 0) {
+            for (int j = i; j < dict.word_count - 1; j++) {
+                dict.words[j] = dict.words[j + 1];
+            }
+            dict.word_count--;
+            printf("Word deleted successfully.\n");
+            return;
+        }
+    }
+    printf("Word not found in the dictionary.\n");
+}
+
+void deleteClue() 
+{
+    char word[MAX_WORD_LENGTH];
+    printf("Enter the word to delete a clue from: ");
+    scanf("%s", word);
+    getchar(); // Consume newline
+
+    for (int i = 0; i < dict.word_count; i++) {
+        if (strcmp(dict.words[i].word, word) == 0) {
+            if (dict.words[i].clue_count == 0) {
+                printf("This word has no clues to delete.\n");
+                return;
+            }
+            for (int j = 0; j < dict.words[i].clue_count; j++) {
+                printf("%d. %s\n", j+1, dict.words[i].clues[j]);
+            }
+            int clueIndex;
+            printf("Enter the number of the clue to delete: ");
+            scanf("%d", &clueIndex);
+            getchar(); // Consume newline
+            if (clueIndex < 1 || clueIndex > dict.words[i].clue_count) {
+                printf("Invalid clue number.\n");
+                return;
+            }
+            for (int j = clueIndex - 1; j < dict.words[i].clue_count - 1; j++) {
+                strcpy(dict.words[i].clues[j], dict.words[i].clues[j + 1]);
+            }
+            dict.words[i].clue_count--;
+            printf("Clue deleted successfully.\n");
+            return;
+        }
+    }
+    printf("Word not found in the dictionary.\n");
+}
+
+void viewWords() 
+{
+    if (dict.word_count == 0) {
+        printf("The dictionary is empty.\n");
+        return;
+    }
+
+    // Simple bubble sort for alphabetical order
+    for (int i = 0; i < dict.word_count - 1; i++) {
+        for (int j = 0; j < dict.word_count - i - 1; j++) {
+            if (strcmp(dict.words[j].word, dict.words[j+1].word) > 0) {
+                WordEntry temp = dict.words[j];
+                dict.words[j] = dict.words[j+1];
+                dict.words[j+1] = temp;
+            }
+        }
+    }
+
+    for (int i = 0; i < dict.word_count; i++) {
+        printf("Word: %s\n", dict.words[i].word);
+        for (int j = 0; j < dict.words[i].clue_count; j++) {
+            printf("  Clue %d: %s\n", j+1, dict.words[i].clues[j]);
+        }
+        printf("Press Enter to continue...");
+        getchar();
+    }
+}
+
+void viewClues() 
+{
+    char word[MAX_WORD_LENGTH];
+    printf("Enter the word to view clues: ");
+    scanf("%s", word);
+    getchar(); // Consume newline
+
+    for (int i = 0; i < dict.word_count; i++) {
+        if (strcmp(dict.words[i].word, word) == 0) {
+            printf("Clues for '%s':\n", word);
+            for (int j = 0; j < dict.words[i].clue_count; j++) {
+                printf("%d. %s\n", j+1, dict.words[i].clues[j]);
+            }
+            return;
+        }
+    }
+    printf("Word not found in the dictionary.\n");
+}
+
+void exportDictionary() 
+{
+    FILE *file = fopen("dictionary.txt", "w");
+    if (file == NULL) {
+        printf("Error opening file for writing.\n");
+        return;
+    }
+
+    for (int i = 0; i < dict.word_count; i++) {
+        fprintf(file, "%s\n", dict.words[i].word);
+        fprintf(file, "%d\n", dict.words[i].clue_count);
+        for (int j = 0; j < dict.words[i].clue_count; j++) {
+            fprintf(file, "%s\n", dict.words[i].clues[j]);
+        }
+    }
+
+    fclose(file);
+    printf("Dictionary exported successfully.\n");
+}
+
+void importDictionary() 
+{
+    FILE *file = fopen("dictionary.txt", "r");
+    if (file == NULL) {
+        printf("Error opening file for reading.\n");
+        return;
+    }
+
+    char choice;
+    printf("Do you want to overwrite existing entries? (y/n): ");
+    scanf(" %c", &choice);
+    getchar(); // Consume newline
+
+    if (choice == 'y' || choice == 'Y') {
+        dict.word_count = 0;
+    }
+
+    while (!feof(file) && dict.word_count < MAX_WORDS) {
+        WordEntry newEntry;
+        if (fscanf(file, "%s\n", newEntry.word) != 1) break;
+        if (fscanf(file, "%d\n", &newEntry.clue_count) != 1) break;
+        
+        for (int i = 0; i < newEntry.clue_count; i++) {
+            if (fgets(newEntry.clues[i], MAX_CLUE_LENGTH, file) == NULL) break;
+            newEntry.clues[i][strcspn(newEntry.clues[i], "\n")] = 0; // Remove newline
+        }
+        
+        dict.words[dict.word_count++] = newEntry;
+    }
+
+    fclose(file);
+    printf("Dictionary imported successfully.\n");
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void initializeBoard() 
+{
+    srand(time(NULL));
+    int save;
+    for (int i = 0; i < boardSize; i++) 
+    {
+        save=rand()%boardSize;
+        for (int j = 0; j < boardSize; j++) 
+        {
+            if(j==save)
+            {
+                board[i][j] = toupper(dict.words[rand()%(dict.word_count)].word[0]);
+            }
+            else
+            {
+                board[i][j] = 'A' + (rand() % 26);
+            }
+        }
+    }
+}
+
+void displayBoard() 
+{
+    for (int i = 0; i < boardSize; i++) {
+        for (int j = 0; j < boardSize; j++) {
+            printf("%c ", board[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int selectBoardSize() 
+{
+    int size;
+    do {
+        printf("Enter board size (3-10): ");
+        scanf("%d", &size);
+        getchar(); // Consume newline
+    } while (size < MIN_BOARD_SIZE || size > MAX_BOARD_SIZE);
+    return size;
+}
+
+WordEntry* findWordStartingWith(char letter) {
+    for (int i = 0; i < dict.word_count; i++) {
+        if (toupper(dict.words[i].word[0]) == letter) {
+            return &dict.words[i];
+        }
+    }
+    return NULL;
+}
+
+int askTrivia(WordEntry* word) 
+{
+    if (word->clue_count == 0) {
+        printf("No trivia available for this word.\n");
+        return 0;
+    }
+    int clueIndex = rand() % word->clue_count;
+    printf("Trivia: %s\n", word->clues[clueIndex]);
+    printf("Your answer: ");
+    char answer[MAX_WORD_LENGTH];
+    fgets(answer, MAX_WORD_LENGTH, stdin);
+    answer[strcspn(answer, "\n")] = 0; // Remove newline
+
+    return strcasecmp(answer, word->word) == 0;
+}
+
+void playGame() 
+{
+    int currentRow = 0;
+    int correct = 0;
+
+    while (currentRow < boardSize) {
+        printf("Select a letter from row %d: ", currentRow + 1);
+        char selectedLetter;
+        scanf(" %c", &selectedLetter);
+        getchar(); // Consume newline
+
+        WordEntry* word = findWordStartingWith(toupper(selectedLetter));
+        if (word == NULL) {
+            printf("No word found starting with this letter. Try again.\n");
+            continue;
+        }
+
+        if (askTrivia(word)) {
+            printf("Correct!\n");
+            board[currentRow][selectedLetter - 'A'] = '*';
+            correct = 1;
+        } else {
+            printf("Incorrect. The correct answer was: %s\n", word->word);
+            board[currentRow][selectedLetter - 'A'] = '-';
+        }
+
+        displayBoard();
+
+        if (currentRow == boardSize - 1 && correct) {
+            printf("Congratulations! You've won the game!\n");
+            return;
+        }
+
+        if (correct) {
+            currentRow++;
+            correct = 0;
+        } else if (currentRow == boardSize - 1 || (currentRow < boardSize - 1 && board[currentRow][boardSize-1] == '-')) {
+            printf("Game over. You didn't answer correctly in this row.\n");
+            return;
+        }
+    }
+}
