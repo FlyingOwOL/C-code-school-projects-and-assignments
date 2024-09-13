@@ -1,0 +1,62 @@
+#include <stdio.h>
+
+int main()
+{
+    int year=0;
+    int yearOfhayop=0;
+    printf("Enter your year of birth:");
+    scanf("%d",&year);
+    yearOfhayop=(year-4)%12;
+    switch(yearOfhayop)
+    {
+        case 0:
+            printf("year of rat\n");
+        break;
+        case 1:
+            printf("year of ox\n");
+        
+        break;
+        case 2:
+            printf("year of tiger\n");
+        
+        break;
+        case 3:
+            printf("year of rabbit\n");
+        
+        break;
+        case 4:
+            printf("year of dragon\n");
+        
+        break;
+        case 5:
+            printf("year of snake\n");
+        
+        break;
+        case 6:
+            printf("year of horse\n");
+        
+        break;
+        case 7:
+            printf("year of sheep\n");
+        
+        break;
+        case 8:
+            printf("year of monkey\n");
+        
+        break;
+        case 9:
+            printf("year of rooster\n");
+        
+        break;
+        case 10:
+            printf("year of dog\n");
+        
+        break;
+        case 11:
+            printf("year of pig\n");
+        
+        break;
+    }
+
+    return 0;
+}
