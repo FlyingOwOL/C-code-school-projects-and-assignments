@@ -1,0 +1,65 @@
+#include <stdio.h>
+
+int main(void)
+{
+	int num=0;
+	printf("Enter 3 digits:");
+	scanf("%d", &num);
+	printf("1.%d \n2.%d \n3.%d",num / 100,num % 100 / 10, num % 10 ); //displays the first, second, and third digit
+  return 0;
+}
+
+#include <stdio.h>
+#define PI 3.1416
+
+int main(void) //computes for the area of a circle input the radius 
+{
+	float num=0;
+	printf("Enter value of radius:");
+	scanf("%f", &num);
+	printf("Area of a circle with radius %.0f is %.2f\n", num, num*num*PI  );
+	
+	return 0;
+}
+
+#include <stdio.h>
+#define km_To_m 1000
+
+int main(void) //converts KM to M
+{
+	int num=0;
+	printf("Enter distance in KM:");
+	scanf("%d", &num);
+	printf("%dkm in meters is equal to %dm", num, num*km_To_m);
+	
+	return 0;
+}
+
+#include <stdio.h>
+#include <math.h>
+
+int main(void) //Finds the roots of a quadratic equation assume no imaginary numbers
+{
+	int a,b,c;
+	float roots = 0;
+	printf("Enter value of a:");
+	scanf("%d", &a);
+	printf("Enter value of b:");
+	scanf("%d", &b);
+	printf("Enter value of c:");
+	scanf("%d", &c);
+	if(0<=b*b-4*a*c)
+	{
+	
+		printf("The roots are:");
+		roots=(-b+sqrtf(b*b-4*a*c))/(2*a);
+		printf("%.2f", roots);
+		roots=(-b-sqrtf(b*b-4*a*c))/(2*a);
+		printf(" and %.2f", roots); 
+	}
+	else
+	{
+		printf("Imaginary number detected\n");
+	}
+	return 0;
+}
