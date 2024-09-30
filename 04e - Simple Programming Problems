@@ -1,0 +1,127 @@
+#include <stdio.h>
+
+int main()
+{
+    float fSquarePerimeter = 0, fSlantLength = 0, 
+          fBaseArea = 0,        fSurfaceArea = 0;
+    printf("Enter value of square perimeter:");
+    scanf("%f", &fSquarePerimeter);
+    printf("Enter value of slant length:");
+    scanf("%f", &fSlantLength);
+    printf("Enter value of base area:");
+    scanf("%f", &fBaseArea);
+    fSurfaceArea = fSquarePerimeter * fSlantLength  / 2 + fBaseArea;
+    printf("Your surface area is: %.2f", fSurfaceArea);
+    return 0;
+}
+
+#include <stdio.h>
+int main()
+{
+    float fPrice = 0, fTax = 0;
+    printf("Enter price:");
+    scanf("%f", &fPrice);
+    printf("Enter tax rate:");
+    scanf("%f", &fTax);
+    printf("\n");
+    printf("Before Tax:%6.2f\n", fPrice-fPrice*fTax/100);
+    printf("Tax %6.2f: %5.2f\n", fTax, fPrice*fTax/100);
+    printf("-------------------\n");
+    printf("Total%5s: %5.2f", " ", fPrice);
+    return 0;
+}
+
+
+#include <stdio.h>
+int main()
+{
+    float fHeightFeet = 0, fHeightInch = 0, 
+          fHeightCM = 0; 
+    printf("Enter height in feet:");
+    scanf("%f", &fHeightFeet);
+    printf("Enter addition height in inch:");
+    scanf("%f", &fHeightInch);
+    fHeightInch += fHeightFeet * 12; //Converts feet to inch and adds any additional inches
+    fHeightCM = fHeightInch * 2.54; //Converts inches to CM
+    printf("Total height in cm is: %.2f", fHeightCM);
+}
+
+#include <stdio.h>
+int main()
+{
+    int nNum1 = 0, nNum2 = 0;
+    printf("Enter a 3 digit number:");
+    scanf("%d", &nNum1);
+    nNum2 = nNum1 / 100 + nNum1 % 10 * 100 + nNum1 / 10 % 10 * 10; //reverses 3 digit numbers
+    printf("New 3 digit number: %d", nNum2);
+}
+
+#include <stdio.h>
+int main()
+{
+    int nNum1 = 0, nNum2 = 0, nHolder = 0;
+    printf("Enter first number:");
+    scanf("%d", &nNum1);
+    printf("Enter second number:");
+    scanf("%d", &nNum2);
+    nHolder = nNum2; //saves value of 2nd number
+    nNum2 = nNum1; //replaces value of 2nd number with first
+    nNum1 = nHolder; //replacese value of 1st number with saved value of 2nd number
+    printf("First number %d\n", nNum1);
+    printf("Second number %d\n", nNum2);
+}
+
+
+#include <stdio.h>
+int main()
+{
+    int nThousand = 0, nFiveHundred = 0, nTwoHundred = 0, nHundred = 0, 
+        nFifty = 0,    nTwenty = 0,      nTen = 0,        nFive = 0, nOne = 0,
+        nTwentyFiveCent = 0, nTenCent = 0, nFiveCent = 0, nCent = 0;
+    float fInput = 0;
+    printf("Enter amount:");
+    scanf("%f", &fInput);
+    nCent =           fInput * 100;  //converts peso to cent
+    nFiveCent =       nCent / 5;     //converts each 5 cent to 5 cents
+    nCent =           nCent % 5;     //gives remaining cent after converting to 5 cents
+    nTwentyFiveCent = nFiveCent / 5; //converts each five 5cents into 25 cents
+    nFiveCent =       nFiveCent % 5; //gives remaining 5cents after converting to 25 cents
+    nTenCent =        nFiveCent / 2; //converts each two 5cents into 10cents
+    nFiveCent =       nFiveCent % 2; //gives remaining 5cents after converting to 10cents
+    
+    nOne =            nTwentyFiveCent / 4; //every four 25cents to 1 peso
+    nTwentyFiveCent = nTwentyFiveCent % 4; //gives remaining 25 cents
+    nFive =           nOne / 5; //every five 1peso to 5peso
+    nOne =            nOne % 5;//gives remaining peso 
+    nTen =            nFive / 2; //every two 5peso to 10peso
+    nFive =           nFive % 2; //gives remaining 5peso
+    nFifty =          nTen / 5; //every five 10peso to Fifty
+    nTen =            nTen % 5;//gives remaining 10peso
+    nTwenty =         nTen / 2;//every two 10peso to twenty
+    nTen =            nTen % 2;//gives remaining 10peso
+    
+    nHundred =        nFifty / 2;//every two 50peso to nHundred
+    nFifty =          nFifty % 2;//gives remaining 50peso
+    nFiveHundred =    nHundred / 5;//every five 1hundred to 5hundred
+    nHundred =        nHundred % 5;//gives remaining 1hundred
+    nTwoHundred =     nHundred / 2;//every two 1hundred to 2hundred
+    nHundred =        nHundred % 2;//gives remaining 1hundred
+    
+    nThousand =       nFiveHundred / 2; //every two 5hundred to Thousand
+    nFiveHundred =    nFiveHundred % 2;//gives remaining 5hundred
+    printf("Thousand: %d\n", nThousand);
+    printf("Five Hundred: %d\n", nFiveHundred);
+    printf("Two Hundred: %d\n", nTwoHundred);
+    printf("Hundred: %d\n", nHundred);
+    printf("Fifty: %d\n", nFifty);
+    printf("Twenty: %d\n", nTwenty);
+    printf("Ten: %d\n", nTen);
+    printf("Five: %d\n", nFive);
+    printf("One: %d\n", nOne);
+    printf("Twenty FiveCent: %d\n", nTwentyFiveCent);
+    printf("Ten Cent: %d\n", nTenCent);
+    printf("Five Cent: %d\n", nFiveCent);
+    printf("Cent: %d\n", nCent);
+    
+    return 0;
+}   
