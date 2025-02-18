@@ -1,0 +1,640 @@
+#include <stdio.h>
+#define FACEHUGGER 1
+#define CHESTBUSTER 2
+#define XENOMORPH 42
+#define QUEEN 73
+#define EASY 1
+#define MID  5
+#define HARD 15
+ 
+void  displayDividers 	();
+void  displayTitle    	();
+void  playGame 	      	(int*, int*, int*, int*, int*,
+		      	 int*, int*, int*, int*, int*,
+		       	 int*, char*);
+void  displaySettings 	(int*, char*);
+void  changeSettings  	(int*, char*); 
+void  sortSaved 	(int*, int*, int*, int*, int*,
+		         int*, int*, int*, int*, int*);
+void  displayScores   	(int*, int*, int*, int*, int*,
+		      	 int*, int*, int*, int*, int*);
+int   computePower    	(int, int);
+void  countEnemies      (int, int, int*, int*, int*,
+	      		 int*);
+void generateLevel 	(int, char, int, float*);
+void displayEnemies 	(int, int, int, int);
+void displayPanel 	(int, int, int, int);
+int interactPlayer 	(int, int, int, int);
+int computeLevel     	(char*, int, int, int);
+int addDigits 		(int);
+int main (){
+	int dScore1 = 0, 
+	    dScore2 = 0, 
+	    dScore3 = 0, 
+	    dScore4 = 0, 
+	    dScore5 = 0; 			     //stores the 1st to 5th scores
+	int dStudentNum1 = 0, 
+	    dStudentNum2 = 0, 
+	    dStudentNum3 = 0, 
+	    dStudentNum4 = 0, 
+	    dStudentNum5 = 0;			     //stores the 1st to 5th ID numbers
+	    
+	int dStarterLives = 3;
+	char cDifficulty = 'M'; 
+	int nChoice = 0;
+	while (nChoice!=4) {
+		displayDividers ();
+		displayTitle();
+		displayDividers ();
+		printf("Welcome!\n%s\n%s\n%s\n%s\nYour choice: ", 
+		"1.Play",
+		"2.Settings",
+		"3.High Scores",
+		"4.Exit");
+		scanf("%d", &nChoice);
+		switch (nChoice) {
+			case 1:
+				playGame (&dScore1,
+					  &dScore2,
+					  &dScore3,
+					  &dScore4,
+					  &dScore5,
+					  &dStudentNum1,
+					  &dStudentNum2,
+					  &dStudentNum3,
+					  &dStudentNum4,
+					  &dStudentNum5,
+					  &dStarterLives,
+					  &cDifficulty);
+				break;
+			case 2:
+				displaySettings (&dStarterLives, 
+						 &cDifficulty);
+				break;
+			case 3:
+				displayScores  (&dScore1, 
+						&dScore2, 
+						&dScore3, 
+						&dScore4, 
+						&dScore5,
+				 	       	&dStudentNum1, 
+						&dStudentNum2, 
+						&dStudentNum3,
+					       	&dStudentNum4, 
+						&dStudentNum5);
+				break;
+			case 4:
+				displayDividers ();
+				printf ("Thank you for playing\n");
+				break;
+			default:
+				printf ("Invalid input\n");
+		}
+	}
+	return 0;
+}
+/*
+	This function displays the Title of the program
+	@print Space Invaders in ASCII art
+*/
+void 
+displayTitle ()
+{
+	printf (" ____                         ___                     _                \n");
+	printf ("/ ___| _ __   __ _  ___ ___  |_ _|_ ____   ____ _  __| | ___ _ __ ___\n");
+	printf ("\\___ \\| '_ \\ / _` |/ __/ _ \\  | || '_ \\ \\ / / _` |/ _` |/ _ \\ '__/ __|\n");
+	printf (" ___) | |_) | (_| | (_|  __/  | || | | \\ V / (_| | (_| |  __/ |  \\__ \\ \n");
+	printf ("|____/| .__/ \\__,_|\\___\\___| |___|_| |_|\\_/ \\__,_|\\__,_|\\___|_|  |___/\n");
+	printf ("      |_|  							      \n");
+}
+/*
+	This function displays the dividers
+	@print 70 dashes
+*/
+void
+displayDividers ()
+{
+	printf("%s%s%s%s%s%s%s\n",
+	"----------", "----------",
+	"----------", "----------",
+	"----------", "----------",
+	"----------");
+}
+/*
+	This function governs the overall gameplay function of the program
+	param *pScore1 passes the adddress for a Score1
+	param *pScore2 passes the adddress for a Score2
+	param *pScore3 passes the adddress for a Score3
+	param *pScore4 passes the adddress for a Score4
+	param *pScore5 passes the adddress for a Score5
+	param *pStudentNum1 passes the address for a student ID1
+	param *pStudentNum2 passes the address for a student ID2
+	param *pStudentNum3 passes the address for a student ID3
+	param *pStudentNum4 passes the address for a student ID4
+	param *pStudentNum5 passes the address for a student ID5
+	param *pDifficulty passes the address of equivalent amount of lives
+	param *pDifficulty passes the address of equivalent difficulty
+	displays the title, dividers, and game itself
+*/
+void
+playGame (int  *pScore1,
+	  int  *pScore2,
+	  int  *pScore3,
+	  int  *pScore4,
+	  int  *pScore5,
+	  int  *pStudentNum1,
+	  int  *pStudentNum2,
+	  int  *pStudentNum3,
+	  int  *pStudentNum4,
+	  int  *pStudentNum5,
+	  int  *pLives,
+	  char *pDifficulty)
+{
+	int dScore;
+	int dUserID;
+	int dLevel;
+	int dLives;
+	char cUser = '\0';
+	float fUserAns;
+	int dCorrectAns;
+	do{
+		dScore = 0;
+		dLevel = 1;
+		dLives = *pLives;
+		displayDividers ();
+		displayTitle ();
+		displayDividers ();
+		do{
+			printf ("Input 8 digit ID number:");
+			scanf ("%d", &dUserID);
+		}while (dUserID < 10000000 || dUserID > 100000000); //Ends only on any 8 digit number
+		do{
+			displayDividers ();
+			displayTitle ();
+			displayDividers ();
+			printf("ID no:%d  Score:%d  Difficulty:%c  Lives:%d  Level:%d\n", dUserID, dScore, *pDifficulty, dLives, dLevel);
+			dCorrectAns = computeLevel (pDifficulty, dLevel, dUserID, dLives);
+			printf ("\n\n");
+			generateLevel (dCorrectAns, *pDifficulty, dLevel, &fUserAns);
+			if (dCorrectAns == fUserAns){
+				dScore++;
+				dLevel++;
+			} 
+			else{
+				dLives--;
+			}
+			
+		}while (dLives > 0 && dLevel < 11); //Loops if both lives are more than 0 and level is less than 11
+		if (*pScore1 <= dScore && *pStudentNum1 == dUserID){ 		//if student ID match and score is the same or higher replace score
+			*pScore1 = dScore;
+		} else if (*pScore2 <= dScore && *pStudentNum2 == dUserID){  	//if student ID match and score is the same or higher replace score
+			*pScore2 = dScore;
+		} else if (*pScore3 <= dScore && *pStudentNum3 == dUserID){ 	//if student ID match and score is the same or higher replace score
+			*pScore3 = dScore;
+		} else if (*pScore4 <= dScore && *pStudentNum4 == dUserID){ 	//if student ID match and score is the same or higher replace score
+			*pScore4 = dScore;
+		} else if (*pScore5 <= dScore && *pStudentNum5 == dUserID){	//if student ID match and score is the same or higher replace score
+			*pScore5 = dScore;
+		} else if (*pStudentNum1 != dUserID &&				//If there is no similar ID save into variables
+			   *pStudentNum2 != dUserID &&				//If the score is not higher than the current saved do not replace
+			   *pStudentNum3 != dUserID &&
+			   *pStudentNum4 != dUserID &&
+			   *pStudentNum5 != dUserID &&
+			   *pScore5 < dScore){
+			*pScore5 = dScore;
+			*pStudentNum5 = dUserID;	    
+		} else{
+			printf ("You weren't able to get into top 5\n\n");
+		}
+		sortSaved (pScore1,						//Sorts the variables from highest to lowest
+			   pScore2,
+			   pScore3,
+			   pScore4,
+			   pScore5,
+			   pStudentNum1,
+			   pStudentNum2,
+			   pStudentNum3,
+			   pStudentNum4,
+			   pStudentNum5);
+		if (dLives > 0 && dLevel >= 10)
+			printf ("Congratulations!\n");
+		else
+			printf ("Better luck next time\n");
+		printf ("ID no. %d8 final score %5d\n", dUserID, dScore);
+		printf ("Pres Y if you want to play again and any key to go  back to main menu:");
+		scanf (" %c", &cUser);
+	} while (cUser == 'Y' || cUser == 'y');
+}
+/*
+	This function computes for the final digit after an exponent
+	@param z stores the number
+	@param y stores the exponent
+	@return power of a number
+*/
+int
+computePower (int base, int exponent)
+{
+    	int power = 1;
+    	int x;
+    	for (x = 0; x < exponent; x++)
+        	power *= base;
+        
+    	return power;
+}
+/*
+	This function adds all the 8 digits of the student ID
+	@param dUserID takes a whole number
+	@return sum of all digits
+*/
+int
+addDigits (int dUserID)
+{
+    int dSum = 0;
+    int x;
+    for (x = 8; x > 0; x--)
+        if (x == 8)
+            dSum += dUserID / computePower (10, x-1);
+        else
+            dSum += dUserID / computePower (10, x-1) % 10;
+    return dSum;
+}
+/*
+	This functions computes for the total correct answer for a level
+	@param *cDifficulty
+	@param dLevel is the current level from 1-10
+	@param dUserID is the 8 digit ID of the user
+	@param dLives is the total lives 
+	return dAns which is the total answer for a level
+*/
+int 
+computeLevel (char* cDifficulty, int dLevel, int dUserID, int dLives)
+{
+	int dAns = 0;
+    	int dSumID = addDigits (dUserID); //Gives the sum of all 8 digits
+    	switch (*cDifficulty){
+    		
+    	    	case 'E':
+    	        	dAns = dSumID * dLevel * EASY * dLives;
+   	         	break;
+  	      	case 'M':
+            		dAns = dSumID * dLevel * MID * dLives;
+            		break;
+        	case 'H':
+            		dAns = dSumID * dLevel * HARD * dLives;
+            		break;
+    	}
+    	return dAns;
+}
+/*
+	This function prints the enemies, the panel for how many enemies multipled by their hit points
+	and as well as the function for the player to give their answer
+	@param dCorrectAns takes in the correct answer
+	@param cDifficulty takes the address for the current difficulty (E,M,H)
+	@param dLevel is the current level
+	@param *fUserAns is the address to update the user answer used in comparison later
+	@displays enemies, the panel, and user input
+*/
+void
+generateLevel (int dCorrectAns, 
+	       char cDifficulty,
+	       int dLevel,
+	       float* fUserAns)
+{
+	int dFaceHugger = 0;
+	int dChestbuster = 0;
+	int dXenomorph = 0;
+	int dQueen = 0;	
+	countEnemies (dLevel, dCorrectAns, &dFaceHugger, &dChestbuster, &dXenomorph, &dQueen);
+	displayEnemies (dFaceHugger, dChestbuster, dXenomorph, dQueen);
+	displayDividers ();
+	displayPanel (dFaceHugger, dChestbuster, dXenomorph, dQueen);
+	displayDividers ();
+	*fUserAns = interactPlayer (dFaceHugger, dChestbuster, dXenomorph, dQueen);
+}
+/*
+	This function counts how many of each type of enemy should be printed
+	@param dLevel is the current level
+	@param dCorrectAns is the correct answer
+	@param *pFaceHugger is the address for the amount of facehuggers
+	@param *pChestBuster is the address for the amount of chestbusters
+	@param *pXenomorph is the address for the amount of xenomorphs
+	@param *pQueen is the address for the amount of queens
+	@compute the amount of each enemy to be printed later
+*/
+void
+countEnemies (int dLevel,
+	      int dCorrectAns,
+	      int*pFaceHugger,
+	      int*pChestBuster,
+	      int*pXenomorph,
+	      int*pQueen)
+{
+	int dTotal = dCorrectAns;
+	if (dLevel == 10){
+		*pQueen = dTotal / QUEEN;
+		dTotal %= QUEEN;
+	}
+	if (dLevel % 2 == 0){
+		*pXenomorph = dTotal / XENOMORPH;
+		dTotal %= XENOMORPH;
+	}
+	if (dLevel != 2 && dLevel != 5){
+		*pChestBuster = dTotal / CHESTBUSTER;
+		dTotal %= CHESTBUSTER;
+	}
+	*pFaceHugger = dTotal / FACEHUGGER;
+}
+/*
+	This function is responsible for printing the amounnt of enemies on screen
+	@param dFaceHugger is the amount of facehuggers
+	@param dChestbuster is the amount of chestbusters
+	@param dXenomorph is the amount of xenomorphs
+	@param dQueen is the amount of queens
+	@display the enemies on screen
+*/
+void
+displayEnemies (int dFaceHugger,
+		int dChestbuster,
+		int dXenomorph,
+		int dQueen)
+{
+	int x;
+	for (x = 0; x < dQueen; x++)
+		printf (")))O***O((( ");
+	for (x = 0; x < dXenomorph; x++)
+		printf ("(((((((O,,,o) ");
+	for (x = 0; x < dChestbuster; x++)
+		printf ("\\<^o^>// ");
+	for (x = 0; x < dFaceHugger; x++)
+		printf ("//(~O~)\\ ");
+	printf ("\n");
+}
+/*
+	This function is responsible on printing the enemy hit points as well as how many there are
+	@param dFaceHugger is the amount of facehuggers
+	@param dChestbuster is the amount of chestbusters
+	@param dXenomorph is the amount of xenomorphs
+	@param dQueen is the amount of queens
+	@display the amount times its hitpoints for each enemy
+*/
+void
+displayPanel (int dFaceHugger, 
+	      int dChestbuster,
+	      int dXenomorph,
+	      int dQueen)
+{
+	if (dQueen > 0)
+		printf ("Queen: %d x 7.3\n", dQueen);
+	if (dXenomorph > 0)
+		printf ("Xenomorph: %d x 4.2\n", dXenomorph);
+	if (dChestbuster > 0)
+		printf ("Chestbuster: %d x 2\n", dChestbuster);
+	if (dFaceHugger > 0)
+		printf ("Facehugger: %d x 1\n", dFaceHugger);
+}
+/*
+	This function is responsible for player input and interaction 
+	@param dFaceHugger is the amount of facehuggers
+	@param dChestbuster is the amount of chestbusters
+	@param dXenomorph is the amount of xenomorphs
+	@param dQueen is the amount of queens
+	@return the total of each numerical input from the player
+*/
+int
+interactPlayer (int dFaceHugger, 
+		int dChestbuster, 
+		int dXenomorph, 
+		int dQueen)
+{
+	int dUserAns;
+	int dPlyr1 = 0, dPlyr2 = 0;
+	float fPlyr3 = 0, fPlyr4 = 0;
+	if (dFaceHugger > 0){
+		printf ("Facehugger: ");
+		scanf ("%d", &dPlyr1);
+	}
+	if (dChestbuster > 0){
+		printf ("Chestbuster: ");
+		scanf ("%d", &dPlyr2);
+	}
+	if (dXenomorph > 0){
+		printf ("Xenomorph: ");
+		scanf ("%f", &fPlyr3);
+	}
+	if (dQueen > 0){
+		printf ("Queen: ");
+		scanf ("%f", &fPlyr4);
+	}
+	dUserAns = dPlyr1 + dPlyr2 + (int)(fPlyr3 * 10 + fPlyr4 * 10); //gets the sum of all input
+	return dUserAns;
+}
+/*	This function displays the settings
+	@param pStarterLives takes an address to change amount of lives
+	@param pDifficulty takes an address to change difficulty
+	@print title, dividers, and overall display of the settings
+*/
+void
+displaySettings (int* pStarterLives, char* pDifficulty)
+{
+	displayDividers ();
+	displayTitle ();
+	displayDividers ();
+	char cChoice = '\0';
+	
+	printf ("Amount of lives:%d Difficulty:%c\n", *pStarterLives, *pDifficulty);
+	do{
+		printf ("Are you gonna adjust the settings(Y/N)? ");
+		scanf (" %c", &cChoice);
+		switch (cChoice)
+		{
+			case 'y':
+			case 'Y':
+				changeSettings (pStarterLives, pDifficulty);
+				break;
+			case 'n':
+			case 'N':
+				printf ("Leaving Settings...\n");
+				break;
+			default:
+				cChoice = '0';
+				printf ("invalid input\n");
+		}
+	}while (cChoice == '0');
+}
+/*
+	This function changes the settings which is later displayed in the function
+	diplaySettings
+	@param pStarterLives takes in the address to change amount of lives
+	@param pDifficulty takes in the address to change the difficulty E, M, or H
+	@return updated value of pStarterLives or pDifficulty
+*/
+void
+changeSettings (int  *pStarterLives, 
+		char *pDifficulty)
+{
+	int nChoice = 0;
+	char cChoice = '\0';
+	do{  //This loops if the user decides to change other attributes 
+		do{ //This loops if the user input is invalid for choosing which attribute to change
+			printf ("Change:\n1.Difficulty\n2.Lives\nYour choice:");
+			scanf ("%d", &nChoice);
+			switch (nChoice){ //This switch updates the difficulty of pDifficulty 
+				case 1:
+					do{
+					
+						printf ("Select Difficulty:\n");
+						printf ("E, M, H\nYour choice:");
+						scanf (" %c", &cChoice);
+						switch (cChoice){
+							case 'e':
+							case 'E':
+								*pDifficulty = 'E';
+								break;
+							case 'm':
+							case 'M':
+								*pDifficulty = 'M';
+								break;
+							case 'h':
+							case 'H':
+								*pDifficulty = 'H';
+								break;
+							default:
+								cChoice = '0';
+								printf ("Invalid input\n");
+						}
+					}while (cChoice == '0');
+					break;
+				case 2:
+					do{
+						printf ("Enter amount of lives you want:");
+						scanf ("%d", &nChoice);
+						if (nChoice > 0)
+							*pStarterLives = nChoice;
+						else
+							nChoice = 0; 
+							printf ("Invalid amount of lives\n");
+					} while (nChoice == 0);
+					break;
+				default: 
+					nChoice = 0;
+					printf ("Invalid input\n");
+			}
+		} while (nChoice == 0);
+		printf ("Updated successfully\nDifficulty:%c Lives:%d\n", *pDifficulty, *pStarterLives);
+		printf ("Press any key to leave or N to continue:");
+		scanf (" %c", &cChoice);
+	}while (cChoice == 'n' || cChoice == 'N'); //exits when neither n or N is inputted 
+	printf ("Leaving settings...\n");
+}
+/*
+	This function rearranges the scores into highest to lowest with its corresponding ID number
+	@param *pScore1 takes an address of dScore1
+	@param *pScore2 takes an address of dScore2
+	@param *pScore3 takes an address of dScore3
+	@param *pScore4 takes an address of dScore4
+	@param *pScore5 takes an address of dScore5
+	@param *pStudentNum1 takes an address of dStudentNum1 
+	@param *pStudentNum2 takes an address of dStudentNum2
+	@param *pStudentNum3 takes an address of dStudentNum3
+	@param *pStudentNum4 takes an address of dStudentNum4
+	@param *pStudentNum5 takes an address of dStudentNum5
+	@sort scores from highest to lowest
+*/
+void 
+sortSaved (int *pScore1, 
+           int *pScore2, 
+           int *pScore3, 
+           int *pScore4, 
+           int *pScore5,
+           int *pStudentNum1, 
+           int *pStudentNum2, 
+           int *pStudentNum3, 
+           int *pStudentNum4, 
+           int *pStudentNum5)
+{
+       	int tempScore, tempID;
+
+   	int i;
+    	for (i = 0; i < 4; i++) {  
+        	if (*pScore1 < *pScore2) {
+	            	tempScore = *pScore1;
+	            	*pScore1 = *pScore2;
+	            	*pScore2 = tempScore;
+	
+	            	
+	            	tempID = *pStudentNum1;
+	            	*pStudentNum1 = *pStudentNum2;
+	            	*pStudentNum2 = tempID;
+        	}
+	        if (*pScore2 < *pScore3) {
+	            	tempScore = *pScore2;
+	            	*pScore2 = *pScore3;
+	            	*pScore3 = tempScore;
+	
+	            	
+	            	tempID = *pStudentNum2;
+	            	*pStudentNum2 = *pStudentNum3;
+	            	*pStudentNum3 = tempID;
+	        }
+	        if (*pScore3 < *pScore4) {
+	            	tempScore = *pScore3;
+	            	*pScore3 = *pScore4;
+	            	*pScore4 = tempScore;
+	
+	            	
+	            	tempID = *pStudentNum3;
+	            	*pStudentNum3 = *pStudentNum4;
+	            	*pStudentNum4 = tempID;
+	        }
+	        if (*pScore4 < *pScore5) {
+	                // Swap scores
+	        	tempScore = *pScore4;
+	        	*pScore4 = *pScore5;
+	        	*pScore5 = tempScore;
+	
+	        	// Swap IDs
+	        	tempID = *pStudentNum4;
+	        	*pStudentNum4 = *pStudentNum5;
+	        	*pStudentNum5 = tempID;
+		}
+    	}
+} 
+/*
+	This function displays the current high scores with their scorer
+	@param pScore1 is for the highest score
+	@param pScore2 is for the second highest
+	@param pScore3 is for the third highest score
+	@param pScore4 is for the fourth place score
+	@param pScore5 is for the last place score
+	@param pStudentNum1 is for the 1st ID number  
+	@param pStudentNum2 is for the 2nd ID number 
+	@param pStudentNum3 is for the 3rd ID number 
+	@param pStudentNum4 is for the 4th ID number 
+	@param pStudentNum5 is for the 5th ID number 
+	@print the Highscores and IDnumbers on the side
+*/
+void
+displayScores  (int *pScore1, 
+		int *pScore2, 
+		int *pScore3, 
+		int *pScore4, 
+		int *pScore5,
+	       	int *pStudentNum1, 
+		int *pStudentNum2,
+		int *pStudentNum3,
+		int *pStudentNum4,
+		int *pStudentNum5)
+{
+	displayDividers ();
+	displayTitle ();
+	displayDividers ();
+	printf ("HIGH SCORES:\n");
+	printf ("%s%39s%27s\n",
+		"Rank", "-ID number",
+		"-Score");
+	printf ("1st%31s%08d%23s%5d\n", "-", *pStudentNum1, "-", *pScore1);
+	printf ("2nd%31s%08d%23s%5d\n", "-", *pStudentNum2, "-", *pScore2);
+	printf ("3rd%31s%08d%23s%5d\n", "-", *pStudentNum3, "-", *pScore3);
+	printf ("4th%31s%08d%23s%5d\n", "-", *pStudentNum4, "-", *pScore4);
+	printf ("5th%31s%08d%23s%5d\n", "-", *pStudentNum5, "-", *pScore5);
+}
