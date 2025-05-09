@@ -1,0 +1,204 @@
+#include <stdio.h>
+
+struct dayStructure{
+    char cTodo; // '+' symbol
+    char cEvent; // '#' symbol
+    char cJournalEntry; // '@' symbol
+};
+
+struct calendarStructure{
+    struct dayStructure days[31];
+};
+
+/**
+ * This function initializes the calendar to null 
+ */
+void initializeCalendar(struct calendarStructure *calendar) 
+{
+    for (int i = 0; i < 31; i++) {
+        calendar->days[i].cTodo = ' ';
+        calendar->days[i].cEvent = ' ';
+        calendar->days[i].cJournalEntry = ' ';
+    }
+}
+
+/**
+ * This function gets the values for the Month, Day, and year
+ * @param int *dMonth is the address for dMonth
+ * @param int *dDay is the address for dDay
+ * @param int *dYear is the address for dYear
+ * @return void
+ */
+void getInput(int *dMonth, int *dDay, int *dYear)
+{
+    int isValid = 1;
+    do{
+        printf ("Enter month (1-12):");
+        scanf ("%d", dMonth);
+        if (*dMonth > 0 && *dMonth < 13){
+            isValid = 0;
+        } else {
+            printf ("Month must be 1 to 12\n");
+            isValid = 1;
+        }
+    } while(isValid);
+    
+    do{
+       printf ("Enter day    (1-7):");
+       scanf ("%d", dDay);
+       if (*dDay > 0 && *dDay < 8){
+            isValid = 0;
+        } else {
+            printf ("Days must be 1 to 7\n");
+            isValid = 1;
+        }
+    } while (isValid);
+    
+    do{
+        printf ("Enter year        :");
+        scanf ("%d", dYear);
+       if (*dYear > 0  ){
+            isValid = 0;
+        } else {
+            printf ("Year must greater than 0");
+            isValid = 1;
+        }        
+    } while (isValid);  
+}
+
+/**
+ * This determines if a year is a leapyear or not
+ * @param int dYear the year 
+ * @return 0 or 1
+ */
+int isLeapYear (int dYear)
+{
+    int isTrue = 0;
+    if (dYear % 400 == 0||
+        (dYear % 4 == 0 && dYear % 100 != 0)){
+        isTrue = 1;
+    }
+    return isTrue;
+}
+
+/**
+ * This functions displays the calendar
+ * @param int dMonth copy of the month
+ * @param int dDay copy of the day
+ * @param int dYear copy of the year
+ * @param struct calendarStructure calendar copy of calendar
+ * @return void
+ */
+void displayCalendar(int dMonth, 
+                     int dDay, 
+                     int dYear,
+                     struct calendarStructure calendar)
+{
+    printf ("Sunday  Monday  Tuesday  Wednesday  Thursday  Friday  Satureday\n");
+    int dDefaultDays = 31;
+    if (dMonth == 2){         //February
+        if (isLeapYear(dYear)){
+            dDefaultDays = 29;
+        } else {
+            dDefaultDays = 28;
+        }
+    } else if (dMonth == 4|| //April
+               dMonth == 6|| //June
+               dMonth == 9|| //September
+               dMonth == 11){//November
+        dDefaultDays = 30;
+    }
+    
+        int y;
+        for (y = 1; y < dDay; y++){ //spaces before start day
+            printf ("%9s", " ");
+        }
+        for (y = 1; y <= dDefaultDays; y++){
+            if ( (y + dDay - 2) % 7 == 0){ //next line after 7th day
+                if (y + dDay != 2)
+                    printf ("\n");                
+            }
+            printf ("%2d%1c%1c%1c    ", y, 
+            calendar.days[y - 1].cTodo, 
+            calendar.days[y - 1].cEvent,
+            calendar.days[y - 1].cJournalEntry);
+            
+        }
+    printf ("\n");
+}
+
+/**
+ * This adds a component to a day
+ * @param struct calendarStructure *calendar address to the calendar 
+ * @return void
+ */
+void addComponent(struct calendarStructure *calendar)
+{
+    int dSelection = 0;
+    int dDay;
+    do{
+        printf ("Day(0 to exit): ");
+        scanf ("%d", &dDay);
+        if (dDay != 0){
+            printf ("%s\n%s\n%s\n%s", 
+                    "1. Add todo", 
+                    "2. Add event", 
+                    "3. Add journal entry",
+                    "Your choice:");
+            scanf ("%d", &dSelection);
+            switch (dSelection){
+                case 1:
+                    calendar->days[dDay - 1].cTodo = '+';
+                    break;
+                case 2:
+                    calendar->days[dDay - 1].cEvent = '#';
+                    break;
+                case 3:
+                    calendar->days[dDay - 1].cJournalEntry = '@';
+                    break;
+                default:
+                    printf ("Out of bounds\n");
+                    break;
+            }            
+        } else {
+            printf ("Byebye\n");
+        }
+
+    } while (dDay != 0);
+}
+
+/**
+ * This function displays the components and their days
+ * @param struct calendarStructure calendar copy of the struct
+ * @return void
+ */
+void displayComponent(struct calendarStructure calendar)
+{
+    int x;
+    for (x = 0; x < 31; x++){
+        if (calendar.days[x].cTodo != ' '){
+            printf ("to do on %2d\n", x + 1);
+        }
+        if (calendar.days[x].cEvent != ' '){
+            printf ("Event on %2d\n", x + 1);
+        }   
+        if (calendar.days[x].cJournalEntry != ' '){
+            printf ("Journal Entry on %2d\n", x + 1);
+        }   
+    }
+}
+
+int main()
+{
+    int dMonth, 
+        dDay, 
+        dYear;
+    struct calendarStructure calendar;
+    initializeCalendar (&calendar);
+    getInput (&dMonth, &dDay, &dYear);
+    displayCalendar (dMonth, dDay, dYear, calendar);
+    addComponent (&calendar);
+    displayComponent (calendar);
+    displayCalendar (dMonth, dDay, dYear, calendar);
+    return 0;
+}
